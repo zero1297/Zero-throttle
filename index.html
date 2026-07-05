@@ -34,8 +34,8 @@
 <!-- ══ Nav ══ -->
 <nav style="position:sticky;top:0;z-index:50;background:rgba(250,248,245,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #E9E3D8">
   <div style="max-width:1160px;margin:0 auto;padding:12px 28px;min-height:74px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap">
-    <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none">
-      <span style="width:11px;height:11px;background:#C98A3B;transform:rotate(45deg);display:block"></span>
+    <a href="#top" style="display:flex;align-items:center;gap:12px;text-decoration:none">
+      <img src="images/logo-mark.png" alt="" style="height:42px;width:auto;display:block">
       <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:.01em;color:#16243D">Cortes <span style="font-weight:600;color:#5A6478">Cleanouts</span></span>
     </a>
     <div style="display:flex;align-items:center;gap:26px;flex-wrap:wrap">
@@ -73,8 +73,10 @@
       </div>
     </div>
     <div style="position:relative">
-      <div class="image-slot on-dark" id="hero-truck" style="width:100%;height:470px;border-radius:18px;background:rgba(247,243,236,.06)">Drop a photo of your truck or crew here</div>
-      <div style="position:absolute;left:-18px;bottom:26px;background:#FFFFFF;border-radius:14px;padding:16px 22px;box-shadow:0 24px 60px rgba(8,14,28,.45);display:flex;align-items:center;gap:14px">
+      <div style="width:100%;height:470px;box-sizing:border-box;background:#FFFFFF;border-radius:18px;box-shadow:0 30px 80px rgba(8,14,28,.5);display:flex;align-items:center;justify-content:center;padding:48px 44px">
+        <img src="images/logo-lockup.png" alt="Cortes Cleanouts — We clean it out. You move forward." style="max-width:100%;max-height:100%;width:auto;height:auto;display:block">
+      </div>
+      <div style="position:absolute;left:-18px;bottom:-30px;background:#FFFFFF;border-radius:14px;padding:16px 22px;box-shadow:0 24px 60px rgba(8,14,28,.45);display:flex;align-items:center;gap:14px">
         <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;color:#16243D">4.9</span>
         <span style="display:block">
           <span style="display:block;color:#C98A3B;font-size:15px;letter-spacing:3px">★★★★★</span>
@@ -385,7 +387,8 @@
         <label style="display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;color:#3D4657">What needs to go?
           <textarea name="items" rows="4" placeholder="e.g. A sectional sofa, two mattresses, and a garage full of boxes" class="field" style="width:100%;box-sizing:border-box;padding:13px 15px;border-radius:10px;border:1px solid #DCD5C8;background:#FBFAF7;font-family:'Public Sans',sans-serif;font-size:15.5px;font-weight:400;color:#1B2537;outline:none;resize:vertical"></textarea>
         </label>
-        <button type="submit" class="btn-gold" style="margin-top:4px;background:#C98A3B;color:#16243D;font-family:'Public Sans',sans-serif;font-size:16px;font-weight:700;padding:16px 28px;border-radius:10px;border:none;cursor:pointer">Send my quote request</button>
+        <button type="submit" id="quote-submit" class="btn-gold" style="margin-top:4px;background:#C98A3B;color:#16243D;font-family:'Public Sans',sans-serif;font-size:16px;font-weight:700;padding:16px 28px;border-radius:10px;border:none;cursor:pointer">Send my quote request</button>
+        <p id="quote-error" style="display:none;margin:0;font-size:13px;color:#C0392B;text-align:center">Something went wrong sending your request. Please call us instead at <a href="tel:+18652087278" style="color:#C0392B;font-weight:600">(865) 208-7278</a>.</p>
         <p style="margin:0;font-size:12.5px;color:#8A8FA0;text-align:center">No spam, no obligation. We'll call once and that's it.</p>
       </form>
       <div id="quote-success" style="display:none;min-height:380px;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px">
@@ -444,13 +447,32 @@
 <script>
   const quoteForm = document.getElementById('quote-form');
   const quoteSuccess = document.getElementById('quote-success');
-  quoteForm.addEventListener('submit', (e) => {
+  const quoteError = document.getElementById('quote-error');
+  const quoteSubmit = document.getElementById('quote-submit');
+  quoteForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    quoteForm.style.display = 'none';
-    quoteSuccess.style.display = 'flex';
+    quoteError.style.display = 'none';
+    quoteSubmit.disabled = true;
+    quoteSubmit.textContent = 'Sending...';
+    try {
+      const response = await fetch('quote-handler.php', {
+        method: 'POST',
+        body: new FormData(quoteForm),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Request failed');
+      quoteForm.style.display = 'none';
+      quoteSuccess.style.display = 'flex';
+    } catch (err) {
+      quoteError.style.display = 'block';
+    } finally {
+      quoteSubmit.disabled = false;
+      quoteSubmit.textContent = 'Send my quote request';
+    }
   });
   document.getElementById('quote-reset').addEventListener('click', () => {
     quoteForm.reset();
+    quoteError.style.display = 'none';
     quoteForm.style.display = 'flex';
     quoteSuccess.style.display = 'none';
   });

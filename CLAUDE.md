@@ -14,6 +14,6 @@ Static single-page marketing site for Cortes Cleanouts (junk removal, Knoxville,
 ## Notes
 
 - The before/after section uses real photos (`images/bedroom-before.jpg`, `images/bedroom-after.jpg`, `images/yard-before.png`, `images/yard-after.png`, pulled from the design project) in a draggable compare slider (`.compare` elements, wired up in the trailing `<script>`).
-- Image placeholders (hero truck, crew photo) are still dashed-border divs with class `image-slot` — replace with `<img>` when real photos exist.
-- The quote form is front-end only; submissions go nowhere until wired to a backend/form service.
+- The nav logo (`images/logo-mark.png`) and hero logo lockup (`images/logo-lockup.png`) come from the design project's asset uploads. Image placeholder for the crew photo is still a dashed-border div with class `image-slot` — replace with `<img>` when a real photo exists.
+- The quote form POSTs to `quote-handler.php`, which emails the submission to CortesCleanouts@outlook.com via PHP's `mail()`. Requires PHP hosting (SiteGround) — won't work when opening `index.html` directly from the filesystem or via `npm run dev` (no PHP there). SMS notifications were considered but skipped (would require a paid Twilio account).
 - A second design variant exists in the design project (`Cortes Cleanouts Charcoal.dc.html`) but is not implemented.
