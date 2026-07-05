@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 
 $toAddress = 'CortesCleanouts@outlook.com';
+$fromAddress = 'noreply@cortescleanouts.com';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -35,11 +36,11 @@ $body = "New quote request from the Cortes Cleanouts website:\n\n"
     . "What needs to go:\n{$items}\n";
 
 $headers = [];
-$headers[] = 'From: Cortes Cleanouts Website <' . $toAddress . '>';
+$headers[] = 'From: Cortes Cleanouts Website <' . $fromAddress . '>';
 $headers[] = 'Reply-To: ' . $toAddress;
 $headers[] = 'X-Mailer: PHP/' . phpversion();
 
-$sent = mail($toAddress, $subject, $body, implode("\r\n", $headers));
+$sent = mail($toAddress, $subject, $body, implode("\r\n", $headers), '-f' . $fromAddress);
 
 if ($sent) {
     echo json_encode(['ok' => true]);
